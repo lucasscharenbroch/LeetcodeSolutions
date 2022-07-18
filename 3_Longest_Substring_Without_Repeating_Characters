@@ -1,0 +1,20 @@
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        int longestLength = 0;
+        int left = 0; // start of current string
+        int right = 0; // end of current string
+        HashMap<Character, Integer> seen = new HashMap<>();
+        
+        for(int i = 0; i < s.length(); i++) {
+            Integer lastIndexOfChar = seen.get(s.charAt(i));
+            if(lastIndexOfChar != null && lastIndexOfChar >= left) { // repeated character found
+                longestLength = (right-left > longestLength) ? right-left : longestLength;
+                left = lastIndexOfChar + 1;
+            }
+            seen.put(s.charAt(i), i); // update seen
+            right++;
+        }
+        
+        return (right-left > longestLength) ? right-left : longestLength;
+    }
+}
