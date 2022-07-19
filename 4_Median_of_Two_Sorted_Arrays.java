@@ -74,3 +74,72 @@ class Solution {
         return (numHalfAbove + numHalfBelow) / 2;
     }
 }
+
+/* solution 2 (binary search) */
+
+class Solution {
+    // returns nums[partitionPoint-1] or INT_MIN, if that index is invalid.
+    private int getLastInFirstPartition(int[] nums, int partitionPoint) {
+        if(partitionPoint == 0) {
+            return Integer.MIN_VALUE;
+        }
+        return nums[partitionPoint-1];
+    }
+    
+    // returns nums[partitionPoint] or INT_MAX, if that index is invalid.
+    private int getFirstInSecondPartition(int[] nums, int partitionPoint) {
+        if(partitionPoint == nums.length) {
+            return Integer.MAX_VALUE;
+        }
+        return nums[partitionPoint];
+    }
+    
+    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        // partition nums1 and nums2 such that neither lower partition has 
+        // a higher element than either higher partition.
+        
+        // ensure that nums1 is the shortest of the two arrays (prevent out-of-bounds edgecases)
+        if(nums1.length > nums2.length) {
+            int[] temp = nums2;
+            nums2 = nums1;
+            nums1 = temp;
+        }
+        
+        // binary search for correct partition.
+        int low = 0;
+        int high = nums1.length;
+        int halfCount = (nums1.length + nums2.length) / 2;
+        int partition1 = 0, partition2 = halfCount; // default when arr1.length == 0
+        
+        while(low < high) {
+            int mid = (low + high) / 2;    
+            partition1 = mid;
+            partition2 = halfCount - mid;
+            
+            if(getLastInFirstPartition(nums1, partition1) > 
+               getFirstInSecondPartition(nums2, partition2)) {
+                high = mid - 1; // nums1 partition1 is too large
+            } else if(getLastInFirstPartition(nums2, partition2) >
+                      getFirstInSecondPartition(nums1, partition1)) {
+                low = mid + 1; // nums1 partition1 is too small
+            } else {
+                high = low = mid;
+                break; // correct partition found.
+            }
+        }
+        partition1 = high;
+        partition2 = halfCount - high; 
+        
+        // return median based on partition
+        if((nums1.length + nums2.length) % 2 == 1) { // odd total
+            return Math.min(getFirstInSecondPartition(nums1, partition1),
+                            getFirstInSecondPartition(nums2, partition2));
+        }
+        // even total
+        float highMid = Math.min(getFirstInSecondPartition(nums1, partition1),
+                               getFirstInSecondPartition(nums2, partition2));
+        float lowMid = Math.max(getLastInFirstPartition(nums1, partition1),
+                              getLastInFirstPartition(nums2, partition2));
+        return (highMid + lowMid) / 2;
+    }
+}
