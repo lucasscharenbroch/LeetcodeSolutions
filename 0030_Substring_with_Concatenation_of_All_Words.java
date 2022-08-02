@@ -1,4 +1,4 @@
-// solw solution (fails)
+// recursive hash-map-cloning solution (fails)
 class Solution {
     private HashMap<String, HashMap<Integer, Boolean>> startIndices = new HashMap<>();
     
@@ -44,7 +44,7 @@ class Solution {
     }
 }
 
-// faster solution
+// recursive hash-map-reuse solution
 class Solution {
     private HashMap<String, Integer> wordCounts = new HashMap<>();
     
@@ -84,5 +84,67 @@ class Solution {
         }
         
         return result;
+    }
+}
+
+// sliding window solution (fastest)
+class Solution {
+    public List<Integer> findSubstring(String s, String[] words) {
+        ArrayList<Integer> solutions = new ArrayList<Integer>();
+        
+        //if(s.length() == 0 || words.length == 0) return solutions; // base cases (N/A)
+        
+        HashMap<String, Integer> wordCounts = new HashMap<>();    
+        // fill wordCounts
+        for(String word: words) {
+            // wordCounts[word]++;
+            wordCounts.put(word, (wordCounts.get(word) == null) ? 1 : wordCounts.get(word) + 1);
+        }
+        
+        int wordLength = words[0].length();
+        
+        for(int i = 0; i < wordLength; i++) {
+            // keeps track of WHICH words were removed (to avoid double counts)
+            HashMap<String, Integer> remaining = (HashMap<String, Integer>) wordCounts.clone(); 
+            
+            int correctWords = 0; // keeps track of HOW MANY words were removed 
+            int windowStart = i; // start index of potential solution
+            int windowEnd = i + words.length * wordLength; // end index of potential solution
+            
+            // get initial count in window (the last word will be handled in the following loop)
+            for(int j = windowStart; j < windowEnd - wordLength; j += wordLength) {
+                String current = s.substring(j, j + wordLength); 
+                if(remaining.get(current) != null) {
+                    remaining.put(current, remaining.get(current) - 1); // decrement 
+                    if(remaining.get(current) >= 0) correctWords++;
+                } 
+            }
+            
+            while(windowEnd <= s.length()) {
+                // add last (newly added) word
+                String newWord = s.substring(windowEnd - wordLength, windowEnd);
+                if(remaining.get(newWord) != null) {
+                    remaining.put(newWord, remaining.get(newWord) - 1);    
+                    if(remaining.get(newWord) >= 0) correctWords++;
+                }
+                
+                // check if solution is valid
+                if(correctWords == words.length) solutions.add(windowStart);
+                
+                // remove first word
+                String oldWord = s.substring(windowStart, windowStart + wordLength); 
+                if(remaining.get(oldWord) != null) {
+                    remaining.put(oldWord, remaining.get(oldWord) + 1);
+                    if(remaining.get(oldWord) > 0) correctWords--;
+                }
+                
+                // advance window
+                windowStart += wordLength;
+                windowEnd += wordLength;
+            }
+            
+        }
+        
+        return solutions;
     }
 }
