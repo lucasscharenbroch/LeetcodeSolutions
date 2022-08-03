@@ -10,8 +10,9 @@ class Solution {
             if(nums[mid] >= target) end = mid;
             else start = mid + 1;
         }
-        if(end < 0 || end >= nums.length || nums[end] != target) // cannot find target
+        if(end < 0 || end >= nums.length || nums[end] != target){ // cannot find target
             return new int[]{-1, -1};
+        }
         int[] solution = {end, 0};
         
         // binary search for last occurence of target
