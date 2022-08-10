@@ -3,9 +3,9 @@ class Solution {
     int n;
     ArrayList<List<String>> result = new ArrayList<>();
     char[][] board;
-    HashMap<Integer, Integer> columnHasQueen = new HashMap<>();
-    HashMap<Integer, Integer> upDiagonalHasQueen = new HashMap<>();
-    HashMap<Integer, Integer> downDiagonalHasQueen = new HashMap<>();
+    boolean[] columnHasQueen;
+    boolean[] upDiagonalHasQueen;
+    boolean[] downDiagonalHasQueen;
     
     public List<List<String>> solveNQueens(int n) {
         this.n = n;    
@@ -17,34 +17,39 @@ class Solution {
             }
         }
         
-        backtrack(0, n);
+        // initialize territory arrays
+        columnHasQueen = new boolean[n];
+        upDiagonalHasQueen = new boolean[n * 2];
+        downDiagonalHasQueen = new boolean[n * 2];
+        
+        backtrack(0);
         return result;
     }
     
-    private void backtrack(int r, int queensRemaining) {
+    private void backtrack(int r) {
         for(int c = 0; c < n; c++) {
-            if(isFreeTerritory(r, c)) {
-                markTerritory(r, c, 1); // claim territory
-                board[r][c] = 'Q';
-                if(queensRemaining == 1) result.add(boardToStrList()); // found a solution
-                else backtrack(r + 1, queensRemaining - 1);
-                board[r][c] = '.';
-                markTerritory(r, c, -1); // unclaim territory
-            }
+            // continue if territory is claimed
+            if(columnHasQueen[c] || upDiagonalHasQueen[r + c] || downDiagonalHasQueen[r - c + n])
+                continue;
+            
+            markTerritory(r, c, true); // claim territory
+            board[r][c] = 'Q';
+            if(r == n - 1) result.add(boardToStrList()); // found a solution
+            else backtrack(r + 1);
+            board[r][c] = '.';
+            markTerritory(r, c, false); // unclaim territory
         }
     }
     
     private boolean isFreeTerritory(int r, int c) {
-        return (columnHasQueen.get(c) == null || columnHasQueen.get(c) == 0) &&
-               (upDiagonalHasQueen.get(r + c) == null || upDiagonalHasQueen.get(r + c) == 0) &&
-               (downDiagonalHasQueen.get(r - c) == null || downDiagonalHasQueen.get(r - c) == 0);
+        return !(columnHasQueen[c] || upDiagonalHasQueen[r + c] || downDiagonalHasQueen[r - c + n]);
     }
     
     
-    private void markTerritory(int r, int c, int i) {
-        increment(columnHasQueen, c, i);
-        increment(upDiagonalHasQueen, r + c, i);
-        increment(downDiagonalHasQueen, r - c, i);
+    private void markTerritory(int r, int c, boolean isEntering) {
+        columnHasQueen[c] = isEntering;
+        upDiagonalHasQueen[r + c] = isEntering;
+        downDiagonalHasQueen[r - c + n] = isEntering;
     }
     
     private List<String> boardToStrList() {
@@ -53,9 +58,5 @@ class Solution {
             list.add(String.valueOf(row));    
         }
         return list;
-    }
-    
-    private void increment(HashMap<Integer, Integer> map, int key, int amount) {
-        map.put(key, map.get(key) == null ? amount : map.get(key) + amount);    
     }
 }
