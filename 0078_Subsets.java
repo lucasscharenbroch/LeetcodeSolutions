@@ -3,7 +3,7 @@ class Solution {
         ArrayList<List<Integer>> sets = new ArrayList<>();
         sets.add(new ArrayList<Integer>()); // add the empty set
         
-        for(; i < nums.length; i++) { // for each number, add all subsets that begin with it
+        for(; i < nums.length; i++) { // for each number, add all subsets (of the remaining array) that include it
             List<List<Integer>> subsubsets = subsets(nums, i + 1);
             for(List<Integer> subsubset : subsubsets) {
                 subsubset.add(0, nums[i]);
