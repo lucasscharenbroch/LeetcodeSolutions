@@ -29,3 +29,30 @@ class Solution {
         return isInterLeave(s1, s2, s3, 0, 0);
     }
 }
+
+// 2d-matrix
+class Solution {
+    public boolean isInterleave(String s1, String s2, String s3) {
+        if(s1.length() + s2.length() != s3.length()) return false; // mismatched length edge-case
+        
+        boolean[][] canBeInterleaved = new boolean[s1.length() + 1][s2.length() + 1];
+        
+        for(int r = 0; r < s1.length() + 1; r++) {
+            for(int c = 0; c < s2.length() + 1; c++) {
+                if(r == 0 && c == 0) {
+                    canBeInterleaved[r][c] = true;
+                    continue;
+                }
+                    
+                // cell above is true and s1's char matches 
+                // OR cell to the left is true and s2's char matches
+                canBeInterleaved[r][c] =
+                (r != 0 && canBeInterleaved[r - 1][c] && s1.charAt(r - 1) == s3.charAt(r + c - 1))
+                || 
+                (c != 0 && canBeInterleaved[r][c - 1] && s2.charAt(c - 1) == s3.charAt(r + c - 1));
+            }
+        }
+        
+        return canBeInterleaved[s1.length()][s2.length()];
+    }
+}
