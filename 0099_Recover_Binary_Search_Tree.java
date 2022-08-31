@@ -80,3 +80,34 @@ class Solution {
         }
     }
 }
+
+// inorder traversal ans sorting for validation
+class Solution {
+    private void dfs(TreeNode root, List<TreeNode> list) {
+        if(root == null) return;
+        dfs(root.left, list);
+        list.add(root);
+        dfs(root.right, list);
+    }
+    
+    public void recoverTree(TreeNode root) {
+        ArrayList<TreeNode> nodesAsList = new ArrayList<>();
+        
+        // do an inorder traversal, adding the nodes to the list
+        dfs(root, nodesAsList);
+        
+        ArrayList<TreeNode> sortedNodeList = (ArrayList<TreeNode>) nodesAsList.clone();
+        sortedNodeList.sort((a, b) -> (a.val > b.val) ? 1 : -1);
+        
+        // find incorrect nodes
+        ArrayList<TreeNode> incorrectNodes = new ArrayList<>();
+        for(int i = 0; i < nodesAsList.size(); i++) {
+            if(nodesAsList.get(i).val != sortedNodeList.get(i).val) incorrectNodes.add(nodesAsList.get(i));
+        }
+        
+        // swap incorrect nodes
+        int temp = incorrectNodes.get(0).val;
+        incorrectNodes.get(0).val = incorrectNodes.get(1).val;
+        incorrectNodes.get(1).val = temp;
+    }
+}
