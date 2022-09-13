@@ -28,3 +28,50 @@ class Solution {
         return max;
     }
 }
+
+// O(2n), linear space
+class Solution {
+    public int maxProfit(int[] prices) {
+        int[] maxProfits = new int[prices.length];
+        
+        for(int n = 0; n < 2; n++) { // two transactions
+            int position = Integer.MIN_VALUE; // the "net bank balance"
+            int profit = 0;
+            for(int i = 0; i < prices.length; i++) { // iterate through each price
+                // do one of the following:
+                //  a.) "buy" here, and take the (profit - price) as a position
+                //  b.) keep previous "buy" and profit, and keep position.
+                position = Math.max(position, maxProfits[i] - prices[i]);
+                
+                // ensure profit is never reduced by additional trades, and add
+                // consider the profit of selling this position (the "best" position from 0...i) 
+                // at this price. (update maxProfits accordingly)
+                maxProfits[i] = profit = Math.max(profit, position + prices[i]);
+            }
+        }
+        
+        return maxProfits[prices.length - 1];
+    }
+}
+
+// O(n), constant space
+class Solution {
+    public int maxProfit(int[] prices) {
+        
+        int maxProfit = 0;
+        int maxProfitAfterOneTransaction = 0;
+        int positionBeforeTransaction = Integer.MIN_VALUE;
+        int positionAfterTransaction = Integer.MIN_VALUE;
+        
+        for(int i = 0; i < prices.length; i++) {
+            positionBeforeTransaction = Math.max(positionBeforeTransaction, -prices[i]);
+            maxProfitAfterOneTransaction = Math.max(maxProfitAfterOneTransaction, 
+                                                    positionBeforeTransaction + prices[i]);
+            positionAfterTransaction = Math.max(positionAfterTransaction,
+                                                maxProfitAfterOneTransaction - prices[i]);
+            maxProfit = Math.max(maxProfit, positionAfterTransaction + prices[i]);
+        }
+        
+        return maxProfit;
+    }
+}
