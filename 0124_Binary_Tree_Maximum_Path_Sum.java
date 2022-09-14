@@ -14,38 +14,27 @@
  * }
  */
 class Solution {
-    private int max(Integer... args) {
-        int max = Integer.MIN_VALUE;
-        
-        for(Integer arg : args) {
-            max = Math.max(arg, max);
-        }
-        
-        return max;
-    }
+    private int maxSum = Integer.MIN_VALUE;
     
-    private int maxPathSum(TreeNode root, boolean canSplit) {
-        if(root == null) return 0;
+    private int findMax(TreeNode root) {
+        if(root == null) return 0; 
         
-        int leftNoSplit = maxPathSum(root.left, false);
-        int rightNoSplit = maxPathSum(root.right, false);
+        // "splitting" => using root & both children in path
+        // "not splitting" => using root and only one child in path
+        // there can only be one split per path, so only the noSplitMax is returned
         
-        if(!canSplit) {
-            int bestChild = max(leftNoSplit, rightNoSplit); 
-            return max(root.val, root.val + bestChild, bestChild);
-        }
+        int leftMax = findMax(root.left);
+        int rightMax = findMax(root.right);
+        int noSplitMax = Math.max(root.val, root.val + Math.max(leftMax, rightMax));
+        int splitMax = leftMax + root.val + rightMax;
         
-        int leftSplit = maxPathSum(root.left, true);
-        int rightSplit = maxPathSum(root.right, true);
+        maxSum = Math.max(maxSum, Math.max(noSplitMax, splitMax));
         
-        int splitHere = root.val + leftNoSplit + rightNoSplit;
-        int dontSplitHere = max(leftSplit, rightSplit);
-        dontSplitHere += max(0, root.val);
-        
-        return max(root.val, splitHere, dontSplitHere);
+        return noSplitMax;
     }
     
     public int maxPathSum(TreeNode root) {
-        return maxPathSum(root, true);
+        findMax(root);
+        return maxSum;
     }
 }
