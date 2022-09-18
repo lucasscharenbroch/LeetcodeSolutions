@@ -1,43 +1,30 @@
-// "Tree" structure for recording ladders
 class Solution {
-    private class TreeNode {
-        public String val;
-        public TreeNode prev;
-        
-        TreeNode(String value) {
-            val = value;
+    private void addToListMap(HashMap<String, List<String>> map, String k, String s) {
+        if(map.get(k) == null) {
+            map.put(k, new ArrayList<String>());
         }
-        
-        TreeNode(String value, TreeNode previous) {
-            val = value;
-            prev = previous;
-        }
+        map.get(k).add(s);
     }
-    
     
     public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
         
         HashSet<String> wordSet = new HashSet<>(wordList);
         LinkedList<String> wordQueue = new LinkedList<>();
-        LinkedList<TreeNode> nodeQueue = new LinkedList<>();
-        ArrayList<TreeNode> validLadderNodes = new ArrayList<>();
+        HashMap<String, Integer> distFromBegin = new HashMap<>();
+        HashMap<String, List<String>> parentRungs = new HashMap<>();
+        int dist = 0;
+        boolean foundEndWord = false;
         
         wordQueue.add(beginWord);
-        nodeQueue.add(new TreeNode(beginWord));
+        distFromBegin.put(beginWord, 0);
         
-        // BFS, forming a tree of visited nodes
-        while(!wordQueue.isEmpty() && validLadderNodes.isEmpty()) {
+        // BFS
+        while(!wordQueue.isEmpty() && !foundEndWord) {
             int size = wordQueue.size();
+            dist++;
             
             while(size-- > 0) {
                 String currentWord = wordQueue.remove();
-                TreeNode currentNode = nodeQueue.remove();
-                
-                if(currentWord.equals(endWord)) {
-                    validLadderNodes.add(currentNode);
-                }
-                
-                wordSet.remove(currentWord);
                 
                 // for every string that differs by one
                 for(int i = 0; i < currentWord.length(); i++) {
@@ -46,26 +33,40 @@ class Solution {
                         char[] possibleNeighborAsArr = currentWord.toCharArray();
                         possibleNeighborAsArr[i] = c;
                         String possibleNeighbor = String.valueOf(possibleNeighborAsArr);
-                        if(wordSet.contains(possibleNeighbor)) {
+                        if(!wordSet.contains(possibleNeighbor)) continue;
+                        
+                        if(distFromBegin.get(possibleNeighbor) == null) {
                             wordQueue.add(possibleNeighbor);
-                            nodeQueue.add(new TreeNode(possibleNeighbor, currentNode));
+                            distFromBegin.put(possibleNeighbor, dist);
+                        }
+                        if(distFromBegin.get(possibleNeighbor) == dist) {
+                            addToListMap(parentRungs, possibleNeighbor, currentWord);
+                            if(possibleNeighbor.equals(endWord)) foundEndWord = true;
                         }
                     }
                 }
             }
         }
         
-        // form the solution array based on the correctly found tree nodes
-        ArrayList<List<String>> result = new ArrayList<>();
-        for(TreeNode ladderNode : validLadderNodes) {
-            int i = result.size();
-            result.add(new LinkedList<>());
-            while(ladderNode != null) {
-                result.get(i).add(0, ladderNode.val);
-                ladderNode = ladderNode.prev;
+        if(!foundEndWord) return new LinkedList<List<String>>();
+        return getLadders(parentRungs, endWord);
+    }
+    
+    List<List<String>> getLadders(HashMap<String, List<String>> parentRungs, String current) {
+        // when beginWord is reached, return {{beginWord}}
+        if(parentRungs.get(current) == null) return Arrays.asList(Arrays.asList(current));
+        
+        List<List<String>> result = new ArrayList<>();
+        
+        for(String parentRung : parentRungs.get(current)) {
+            List<List<String>> parentLadders = getLadders(parentRungs, parentRung);
+            for(List<String> ladder : parentLadders) {
+                ArrayList<String> newLadder = new ArrayList<>(ladder);
+                newLadder.add(current);
+                result.add(newLadder);
             }
         }
         
         return result;
-    }
+    } 
 }
