@@ -58,3 +58,44 @@ class Solution {
         return currentLIS.size();
     }
 }
+
+// BIT, O(n*lg(2*10e4))
+class Solution {
+    class MaxBIT {
+        int[] keys;
+        
+        public MaxBIT(int capacity) {
+            keys = new int[capacity + 1];
+        }
+        
+        public void update(int key, int val) {
+            while(key < keys.length) {
+                keys[key] = Math.max(keys[key], val);
+                key += (key & -key); // key = next affected range
+            }
+        }
+        
+        public int getMax(int key) {
+            int result = 0;
+            while(key != 0) {
+                result = Math.max(result, keys[key]);
+                key -= (key & -key); // key = parent
+            }
+            return result;
+        }
+    }
+    
+    public int lengthOfLIS(int[] nums) {
+        final int KEY_MAX = 20000;
+        
+        MaxBIT bit = new MaxBIT(KEY_MAX); // bit.getMax(i) returns the length of the LIS 
+                                          // that contains only numbers <= i
+        for(int n : nums) {
+            n += 10000; // add 10e4 to each key to account for negatives
+            int longest = 1 + bit.getMax(n - 1);
+            bit.update(n, longest);
+        }
+        
+        return bit.getMax(KEY_MAX);
+    }
+}
