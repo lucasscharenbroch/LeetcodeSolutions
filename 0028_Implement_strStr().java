@@ -68,3 +68,47 @@ class Solution {
         return j == needle.length() ? haystack.length() - j : -1;
     }
 }
+
+// hashing O(n + m)
+class Solution {
+    // checks if h[i..i+n.length] matches n
+    private boolean stringMatch(String h, int i, String n) {
+        for(int j = i; j < i + n.length(); j++) {
+            if(h.charAt(j) != n.charAt(j - i)) return false;
+        }
+        
+        return true;
+    }
+    
+    public int strStr(String haystack, String needle) {
+        final int P = 31; // arbitrary prime larger than 26
+        final int H = haystack.length(), N = needle.length();
+        
+        // let hash(String s) =  for(i = 0 to s.len): (s[i] - 'a')*(p^i)
+        
+        int[] pPow = new int[Math.max(H, N) + 1]; // pPow[i] = p^i
+        pPow[0] = 1;
+        
+        for(int i = 1; i < pPow.length; i++) {
+            pPow[i] = pPow[i - 1] * P;
+        }
+        
+        int[] hHash = new int[H + 1]; // hHash[i] = hash(h[0..i])
+        for(int i = 0; i < H; i++) {
+            hHash[i + 1] = hHash[i] + (haystack.charAt(i) - 'a') * pPow[i];
+        }
+        
+        int nHash = 0;
+        for(int i = 0; i < N; i++) {
+            nHash += (needle.charAt(i) - 'a') * pPow[i];
+        }
+        
+        // search for matches
+        for(int i = 0; i < H - N + 1; i++) {
+            int hash = (hHash[i + N] - hHash[i]);
+            if(hash == nHash * pPow[i] && stringMatch(haystack, i, needle)) return i;
+        }
+        
+        return -1;
+    }
+}
