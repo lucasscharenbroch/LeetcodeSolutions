@@ -70,3 +70,35 @@ class Solution {
         return low;
     }
 }
+
+// Sliding-Window O(n)
+class Solution {
+    private int arrMax(int[] arr, int start, int end) {
+        int max = Integer.MIN_VALUE;
+        while(start != end) max = Math.max(max, arr[start++]);
+        return max;
+    }
+    
+    public int characterReplacement(String s, int k) {
+        int left = 0; // inclusive
+        int right = 1; // exclusive
+        int[] counts = new int['Z' + 1];
+        counts[s.charAt(0)]++;
+        
+        while(right < s.length()) {
+            // if counts has less than k unpure characters, expand the window
+            if((right - left) - k < arrMax(counts, 'A', 'Z')) {
+                counts[s.charAt(right++)]++;
+            } else { // counts has exactly k unpure characters
+                if((right - left) - k == counts[s.charAt(right)]) { // expand the window if s[right] is pure
+                    counts[s.charAt(right++)]++;
+                } else { // otherwise, slide window
+                    counts[s.charAt(left++)]--;
+                    counts[s.charAt(right++)]++;
+                }
+            }
+        }
+        
+        return right - left;
+    }
+}
