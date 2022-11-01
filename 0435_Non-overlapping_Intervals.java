@@ -48,3 +48,29 @@ class Solution {
         return intervals.length - max;
     }
 }
+
+// Greedy O(nlg(n))
+class Solution {
+    public int eraseOverlapIntervals(int[][] intervals) {
+        int START_MIN = -100000; // smallest interval start
+        
+        Arrays.sort(intervals, (a, b) -> a[1] - b[1]); // sort intervals by end-time
+        
+        int max = 0;
+        int end = START_MIN; // end of current set of intervals
+        
+        // iterate over intervals, and build a "set" (only remember the last
+        // interval's end-time because intervals is now sorted by end-time).
+        // always add a new interval to the set when it doesn't conflict with the other in the set
+        // never add it if it does conflict
+        
+        for(int[] interval : intervals) {
+            if(interval[0] >= end) { // interval doesn't conflict with current intervals
+                max++;
+                end = interval[1];
+            }
+        }
+        
+        return intervals.length - max;
+    }
+}
