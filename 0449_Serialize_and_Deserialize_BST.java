@@ -1,12 +1,4 @@
-/**
- * Definition for a binary tree node.
- * public class TreeNode {
- *     int val;
- *     TreeNode left;
- *     TreeNode right;
- *     TreeNode(int x) { val = x; }
- * }
- */
+// general solution with start and end symbols, works on any binary tree
 public class Codec {
     final char START = (char) (10000 + 1);
     final char END = (char) (10000 + 2);
@@ -42,6 +34,33 @@ public class Codec {
             }
         }
         return null; // shouldn't be reached
+    }
+}
+
+// solution with implied start and ends, more compact but only works on BSTs
+public class Codec {
+
+    // Encodes a tree to a single string.
+    public String serialize(TreeNode root) {
+        if(root == null) return "";
+        return (char) root.val + serialize(root.left) + serialize(root.right);
+    }
+
+    // Decodes your encoded data to tree.
+    int current;
+    public TreeNode deserialize(String data) {
+        current = 0;
+        return construct(data, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+    
+    private TreeNode construct(String data, int min, int max) {
+        if(current == data.length() || (int) data.charAt(current) >= max || 
+                                       (int) data.charAt(current) <= min) return null;
+        
+        TreeNode node = new TreeNode((int) data.charAt(current++));
+        node.left = construct(data, min, node.val);
+        node.right = construct(data, node.val, max);
+        return node;
     }
 }
 
