@@ -1,20 +1,26 @@
 class Solution {
     public int trap(int[] height) {
-        int total = 0;
         int left = 0;
         int right = height.length - 1;
-        while(left < right - 1) {
-            if(height[left] <= height[right]) { // advance left
-                int i = left;
-                while(height[++i] < height[left]) total += height[left] - height[i];
-                left = i;
-            } else { // advance right
-                int i = right;
-                while(height[--i] < height[right]) total += height[right] - height[i];
-                right = i;
+        int currentCapacity = 0;
+        int result = 0;
+        
+        while(left < right) {
+            if(height[left] < height[right]) { // advance left
+                result += Math.max(0, currentCapacity - height[left]);
+                currentCapacity = Math.max(currentCapacity, height[left++]);
+            } else if(height[right] < height[left]) { // advance right
+                result += Math.max(0, currentCapacity - height[right]);
+                currentCapacity = Math.max(currentCapacity, height[right--]);
+            } else { // advance both
+                result += Math.max(0, 2 * (currentCapacity - height[left]));
+                currentCapacity = Math.max(currentCapacity, height[left]);
+                left++; right--;
             }
         }
         
-        return total;
+        if(left == right) result += Math.max(0, currentCapacity - height[left]);
+        
+        return result;
     }
 }
