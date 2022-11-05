@@ -1,3 +1,38 @@
+// Min-Heap and Max-Heap: Insert: O(lg(n)), Median: O(1)
+class MedianFinder {
+    PriorityQueue<Integer> lowHeap; // max-heap, contains lower half of numbers
+    PriorityQueue<Integer> highHeap; // min-heap, contains higher half of numbers
+    
+    public MedianFinder() {
+        lowHeap = new PriorityQueue<>((a, b) -> b - a);
+        highHeap = new PriorityQueue<>();
+    }
+    
+    public void addNum(int num) {
+        // insert num into corect heap
+        int largestSmall = (lowHeap.peek() != null) ? lowHeap.peek() : Integer.MIN_VALUE;
+        int smallestLarge = (highHeap.peek() != null) ? highHeap.peek() : Integer.MAX_VALUE;
+        
+        if(num <= largestSmall) // insert into lowHeap
+            lowHeap.add(num);
+        else
+            highHeap.add(num);
+        
+        // balance heaps
+        if(lowHeap.size() - 2 == highHeap.size())
+            highHeap.add(lowHeap.poll());
+        else if(highHeap.size() - 2 == lowHeap.size())
+            lowHeap.add(highHeap.poll());
+    }
+    
+    public double findMedian() {
+        if(highHeap.size() > lowHeap.size()) return highHeap.peek();
+        else if(lowHeap.size() > highHeap.size()) return lowHeap.peek();
+        else return (highHeap.peek() + lowHeap.peek()) / 2.0;
+    }
+}
+
+// AVL Tree: Insert: O(lg(n)), Median: O(1)
 class MedianFinder {
     class AVLNode {
         AVLNode left, right, parent;
@@ -187,10 +222,3 @@ class MedianFinder {
         }
     }
 }
-
-/**
- * Your MedianFinder object will be instantiated and called as such:
- * MedianFinder obj = new MedianFinder();
- * obj.addNum(num);
- * double param_2 = obj.findMedian();
- */
