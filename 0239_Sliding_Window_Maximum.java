@@ -48,3 +48,37 @@ class Solution {
         return result;
     }
 }
+
+// DP, O(n)
+class Solution {
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        // iterate from left-to-right, taking a running max of each block of k elements
+        int[] leftMax = new int[nums.length];
+        int currentMax = Integer.MIN_VALUE;
+        for(int i = 0; i < nums.length; i++) {
+            if(i % k == 0) currentMax = Integer.MIN_VALUE;
+            currentMax = Math.max(currentMax, nums[i]);
+            leftMax[i] = currentMax;
+        }
+        
+        // do the same, right-to-left
+        int[] rightMax = new int[nums.length];
+        currentMax = Integer.MIN_VALUE;
+        for(int i = nums.length - 1; i >= 0; i--) {
+            currentMax = Math.max(currentMax, nums[i]);
+            rightMax[i] = currentMax;
+            if(i % k == 0) currentMax = Integer.MIN_VALUE;
+        }
+        
+        // for each window of size k, its max will be either rightMax[left] or leftMax[right]
+        int[] result = new int[nums.length - k + 1];
+        int left = 0, right = k - 1;
+        int i = 0;
+        while(right < nums.length) {
+            result[i++] = Math.max(rightMax[left], leftMax[right]);
+            left++; right++;
+        }
+        
+        return result;
+    }
+}
