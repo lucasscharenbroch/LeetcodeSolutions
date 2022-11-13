@@ -1,5 +1,4 @@
-/* solution 1 (linear) */
-
+// O(n) approach
 class Solution {
     public double median(int[] nums) {
         if(nums.length % 2 == 1) { // there is a single middle number
@@ -75,8 +74,7 @@ class Solution {
     }
 }
 
-/* solution 2 (binary search) */
-
+// Binary-Search
 class Solution {
     // returns nums[partitionPoint-1] or INT_MIN, if that index is invalid.
     private int getLastInFirstPartition(int[] nums, int partitionPoint) {
@@ -141,5 +139,37 @@ class Solution {
         float lowMid = Math.max(getLastInFirstPartition(nums1, partition1),
                               getLastInFirstPartition(nums2, partition2));
         return (highMid + lowMid) / 2;
+    }
+}
+
+// Binary-Search
+class Solution {
+    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        int smallPartitionSize = (nums1.length + nums2.length + 1) / 2;
+        boolean singleMedian = (nums1.length + nums2.length) % 2 == 1;
+        int left = Math.max(0, smallPartitionSize - nums2.length);
+        int right = Math.min(nums1.length, smallPartitionSize);
+        
+        // arr1 = [... X1 | Y1 ...]
+        // arr2 = [... X2 | Y2 ...]
+        // where | denotes the partition, and (index of X1 + 1) == | == index of Y1.
+        // note that any of (X1, X2, Y1, and Y2) can be out of bounds.
+        while(left <= right) {
+            int pipe1 = (left + right) / 2; // let | = mid
+            int pipe2 = smallPartitionSize - pipe1; // now |small partitions| == |large partitions| (+- 1)
+            
+            int X1 = (pipe1 == 0) ? Integer.MIN_VALUE : nums1[pipe1 - 1];
+            int X2 = (pipe2 == 0) ? Integer.MIN_VALUE : nums2[pipe2 - 1];
+            int Y1 = (pipe1 == nums1.length) ? Integer.MAX_VALUE : nums1[pipe1];
+            int Y2 = (pipe2 == nums2.length) ? Integer.MAX_VALUE : nums2[pipe2];
+            
+            if(X1 <= Y2 && X2 <= Y1) { // Found a correct, equal-sized partition
+                if(singleMedian) return Math.max(X1, X2);
+                else return (Math.max(X1, X2) + Math.min(Y1, Y2)) / 2.0;
+            } else if(X1 > Y2) right = pipe1 - 1;
+            else left = pipe1 + 1;
+        }
+        
+        return Double.NaN; // this line should never be reached
     }
 }
