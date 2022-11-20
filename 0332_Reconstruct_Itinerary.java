@@ -1,3 +1,4 @@
+// DFS and Backtracking
 class Solution {
     public List<String> findItinerary(List<List<String>> tickets) {
         tickets.sort((t1, t2) -> { // sort tickets by to-airport, lexographically
@@ -40,5 +41,39 @@ class Solution {
         }
         
         return false;
+    }
+}
+
+// Eulerian Path
+class Solution {
+    public List<String> findItinerary(List<List<String>> tickets) {
+        HashMap<String, PriorityQueue<String>> outEdges = new HashMap<>();
+        // use dfs to find an Eulerian path; use priority queues to explore edges in lexographical order
+        
+        for(List<String> ticket : tickets) { // populate outEdges
+            String from = ticket.get(0);
+            String to = ticket.get(1);
+            
+            outEdges.putIfAbsent(from, new PriorityQueue<>());
+            outEdges.get(from).add(to);
+        }
+        
+        LinkedList<String> solution = new LinkedList<>();
+        findEulerianPath("JFK", outEdges, solution);
+        return solution;
+    }
+    
+    private void findEulerianPath(String current, HashMap<String, PriorityQueue<String>> outEdges,
+                                  LinkedList<String> result) {
+        
+        // depth-first explore outgoing edges until the node "gets stuck"
+        if(outEdges.get(current) != null) {
+            while(!outEdges.get(current).isEmpty()) {
+                findEulerianPath(outEdges.get(current).poll(), outEdges, result);
+            }
+        }
+        
+        // when the node is "stuck", it can be appended to the front of the solution
+        result.add(0, current);
     }
 }
