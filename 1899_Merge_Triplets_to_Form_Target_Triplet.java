@@ -1,3 +1,4 @@
+// DP
 class Solution {
     public boolean mergeTriplets(int[][] triplets, int[] target) {
         // we need to find a triplet to fufill each of the following three conditions:
@@ -16,5 +17,23 @@ class Solution {
         }
         
         return false;
+    }
+}
+
+// Greedy
+class Solution {
+    public boolean mergeTriplets(int[][] triplets, int[] target) {
+        // keep a running triplet, always take max operation if the result will stay under target
+        int[] result = new int[3];
+        
+        for(int[] t : triplets) {
+            if(t[0] <= target[0] && t[1] <= target[1] && t[2] <= target[2]) {
+                result[0] = Math.max(result[0], t[0]);
+                result[1] = Math.max(result[1], t[1]);
+                result[2] = Math.max(result[2], t[2]);
+            }
+        }
+        
+        return result[0] == target[0] && result[1] == target[1] && result[2] == target[2];
     }
 }
