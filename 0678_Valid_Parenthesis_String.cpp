@@ -1,3 +1,4 @@
+// Greedy/DP, forwards-and-backwards, O(n)
 class Solution {
 public:
     bool checkValidString(string s) {
@@ -29,5 +30,24 @@ public:
         }
         
         return true;
+    }
+};
+
+// Greedy/DP single-pass, O(n)
+class Solution {
+public:
+    bool checkValidString(string s) {
+        int maxOpen = 0, minOpen = 0;
+        
+        for(int i = 0; i < s.length(); i++) {
+            if(s[i] == '(') maxOpen++, minOpen++;
+            else if(s[i] == ')') maxOpen--, minOpen--;
+            else maxOpen++, minOpen--;
+            
+            if(minOpen < 0) minOpen = 0;
+            if(maxOpen < 0) return false;
+        }
+        
+        return minOpen == 0;
     }
 };
