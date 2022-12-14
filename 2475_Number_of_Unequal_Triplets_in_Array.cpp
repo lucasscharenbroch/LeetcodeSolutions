@@ -16,3 +16,24 @@ public:
         return total;
     }
 };
+
+// Pair-Counting (DP), O(n)
+class Solution {
+public:
+    int unequalTriplets(vector<int>& nums) {
+        int counts[1001] = {0};
+        int numPairs = 0; // total pairwise-distince pairs in nums[0..i]
+        int result = 0;
+        for(int i = 0; i < nums.size(); i++) {
+            int& num = nums[i];
+            int pairsWithNum = counts[num] * (i - counts[num]); // number of pairs that contain num
+            int pairsWithoutNum = numPairs - pairsWithNum;
+            result += pairsWithoutNum; // each (pairWithoutNum) with num creates a new triplet
+            
+            numPairs += i - counts[num]; // number of seen elements that != num
+            counts[num]++;
+        }
+        
+        return result;
+    }
+};
