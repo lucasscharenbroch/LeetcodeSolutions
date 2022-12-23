@@ -37,3 +37,35 @@ public:
     }
     
 };
+
+// Bottom-Up-DP O(n * m)
+class Solution {
+public:
+    int calculateMinimumHP(vector<vector<int>>& dungeon) {
+        int n = dungeon.size();
+        int m = dungeon[0].size();
+        
+        int dp[200][200]; // dp[i][j] = min health needed from (i, j) to (n - 1, m - 1)
+        
+        int lr = n - 1; // last row
+        int lc = m - 1; // last col
+        
+        dp[lr][lc] = max(1, 1 - dungeon[lr][lc]);
+        
+        for(int i = n - 2; i >= 0; i--)  // last col
+            dp[i][lc] = max(max(1, 1 - dungeon[i][lc]), dp[i + 1][lc] - dungeon[i][lc]);
+        for(int j = m - 2; j >= 0; j--)  // last row
+            dp[lr][j] = max(max(1, 1 - dungeon[lr][j]), dp[lr][j + 1] - dungeon[lr][j]);
+        
+        for(int i = n - 2; i >= 0; i--) {
+            for(int j = m - 2; j >= 0; j--) {
+                dp[i][j] = max( // max(min-possible-life, min-to-get-past-this-cell, min-to-get-to-end)
+                                max(1, 1 - dungeon[i][j]), // 1, score needed to get past (i, j)
+                                min(dp[i + 1][j] - dungeon[i][j], dp[i][j + 1] - dungeon[i][j]) // rest
+                              );
+            }
+        }
+        
+        return dp[0][0];
+    }
+};
