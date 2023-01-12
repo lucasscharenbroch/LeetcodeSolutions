@@ -25,6 +25,6 @@ public:
             dfs(neigh, current, labels, cnx, charCounts, result);
         }
         
-        result[current] = charCounts[labels[current] - 'a'] - initialCount; // add 1 for current
+        result[current] = charCounts[labels[current] - 'a'] - initialCount;
     }
 };
