@@ -6,6 +6,8 @@
  *     ListNode(int x) : val(x), next(NULL) {}
  * };
  */
+
+// Shift values, O(n)
 class Solution {
 public:
     void deleteNode(ListNode* node) {
@@ -13,5 +15,14 @@ public:
         for(; node->next->next != nullptr; node = node->next) node->val = node->next->val;
         node->val = node->next->val;
         node->next = nullptr;
+    }
+};
+
+// Swap deleted node with next node, O(1)
+class Solution {
+public:
+    void deleteNode(ListNode* node) {
+        node->val = node->next->val;
+        node->next = node->next->next;
     }
 };
