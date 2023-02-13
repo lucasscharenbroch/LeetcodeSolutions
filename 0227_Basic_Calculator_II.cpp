@@ -12,7 +12,7 @@ public:
             result += s[i] - '0';
         }
         
-        return result;
+        return (is_neg ? -1 : 1) * result;
     }
     
     int calculate(string s) {
