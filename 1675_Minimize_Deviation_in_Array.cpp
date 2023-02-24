@@ -5,9 +5,10 @@ public:
         set<int> s;
         for(int n : nums) s.insert(n % 2 == 1 ? n * 2 : n);
         
-        // now only one operation can be performed: division by 2
         int min_gap = INT_MAX;
       
+        // now only one operation can be performed: division by 2
+        // thus the only way to reduce the deviation is to divide the largest element by 2
         while(true) {
             int current = *(--s.end()); // the largest element in the set
             s.erase(--s.end());
