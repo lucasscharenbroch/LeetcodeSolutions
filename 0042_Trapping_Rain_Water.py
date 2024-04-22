@@ -8,5 +8,3 @@ class Solution:
         boundaries = map(min, zip(left, right))
         water = map(lambda x: x[0] - x[1], zip(boundaries, height))
         return sum(water)
-        
-        
